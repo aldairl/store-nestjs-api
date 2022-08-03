@@ -8,7 +8,11 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateProductDto, UpdateProductDto } from '../dtos/products.dto';
+import {
+  CreateProductDto,
+  QueryProductDto,
+  UpdateProductDto,
+} from '../dtos/products.dto';
 import { ProductsService } from '../services/products.service';
 
 @ApiTags('products')
@@ -18,8 +22,12 @@ export class ProductsController {
 
   @Post()
   @ApiOperation({ summary: 'create product' })
-  create(@Body() payload: CreateProductDto) {
-    return this.productService.create(payload);
+  create(@Body() payload: QueryProductDto) {
+    const product: CreateProductDto = {
+      ...payload,
+      owner: '123456',
+    };
+    return this.productService.create(product);
   }
 
   @Get()

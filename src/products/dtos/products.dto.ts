@@ -16,4 +16,15 @@ export class CreateProductDto {
   owner: string;
 }
 
+export class QueryProductDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @IsPositive()
+  price: number;
+}
+
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
