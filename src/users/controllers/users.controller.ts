@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -28,7 +29,8 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Get(':userId/products')
   @ApiOperation({ summary: 'list user products' })
-  getProducts(@Param('userId') userId: string) {
+  getProducts(@Param('userId') userId: string, @Req() req) {
+    console.log(req.user);
     return this.userService.getProductsByUser(userId);
   }
 

@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { ProductsService } from 'src/products/services/products.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
 import { User } from '../entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +19,13 @@ export class UsersService {
 
   async create(payload: CreateUserDto) {
     const user = await this.findOneByEmail(payload.email);
-    console.log(user);
+
     if (user) throw new BadRequestException('The user already exist');
-    const newUser = new this.userModel(payload);
+    const userData = {
+      ...payload,
+      password: await bcrypt.hash(payload.password, 10),
+    };
+    const newUser = new this.userModel(userData);
     return newUser.save();
   }
 
@@ -29,14 +34,20 @@ export class UsersService {
   }
 
   async findOneByEmail(email: string) {
-    const user = await this.userModel.findOne({ email });
+    const user = await this.userModel.findOne({ email }).exec();
     return user;
   }
 
-  update(id: string, payload: UpdateUserDto) {
+  async update(id: string, payload: UpdateUserDto) {
+    const dataToUp = { ...payload };
+
+    if (payload.password) {
+      dataToUp.password = await bcrypt.hash(payload.password, 10);
+    }
+
     const user = this.userModel.findByIdAndUpdate(
       id,
-      { $set: payload },
+      { $set: dataToUp },
       { new: true },
     );
     if (!user) throw new NotFoundException(`Product #${id} not found`);

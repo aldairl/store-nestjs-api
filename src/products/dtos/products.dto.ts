@@ -1,5 +1,11 @@
 import { PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -11,7 +17,7 @@ export class CreateProductDto {
   @IsPositive()
   price: number;
 
-  @IsString()
+  @IsMongoId()
   @IsNotEmpty()
   owner: string;
 }

@@ -6,8 +6,10 @@ import {
   Param,
   Post,
   Put,
+  Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { MongoIdPipe } from 'src/common/mongo-id.pipe';
 import {
   CreateProductDto,
   QueryProductDto,
@@ -22,10 +24,11 @@ export class ProductsController {
 
   @Post()
   @ApiOperation({ summary: 'create product' })
-  create(@Body() payload: QueryProductDto) {
+  create(@Body() payload: QueryProductDto, @Req() req) {
+    const { userId } = req.user;
     const product: CreateProductDto = {
       ...payload,
-      owner: '123456',
+      owner: userId,
     };
     return this.productService.create(product);
   }
@@ -36,15 +39,21 @@ export class ProductsController {
     return this.productService.getAll();
   }
 
-  @Put()
+  @Put(':id')
   @ApiOperation({ summary: 'update product' })
-  update(@Param('id') id: string, @Body() payload: UpdateProductDto) {
-    return this.productService.update(id, payload);
+  async update(
+    @Param('id', MongoIdPipe) id: string,
+    @Body() payload: UpdateProductDto,
+    @Req() req,
+  ) {
+    const { userId } = req.user;
+    return await this.productService.update(id, payload, userId);
   }
 
-  @Delete()
+  @Delete(':id')
   @ApiOperation({ summary: 'delete product' })
-  delete(@Param('id') id: string) {
-    return this.productService.delete(id);
+  delete(@Param('id', MongoIdPipe) id: string, @Req() req) {
+    const { userId } = req.user;
+    return this.productService.delete(id, userId);
   }
 }
