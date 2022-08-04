@@ -3,6 +3,8 @@
 ```bash
 $ npm install
 ```
+## Documentation
+on route /docs
 
 ## Running the app
 
